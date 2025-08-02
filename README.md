@@ -22,14 +22,16 @@ Jumper wires
 Power supply for motors and servo
 
 📌 Pin Configuration
-Component	Pin in Code	Description
-Motor1 (Front Right)	9 (PWM), 8 (Digital)	Speed control and direction
-Motor2 (Front Left)	11 (PWM), 10 (Digital)	Speed control and direction
-Motor3 (Rear Right)	6 (PWM), 4 (Digital)	Speed control and direction
-Motor4 (Rear Left)	3 (PWM), 2 (Digital)	Speed control and direction
-Servo Motor	14 (PWM Digital)	Servo control
-Ultrasonic Trigger	12	Trigger pin for sensor
-Ultrasonic Echo	13	Echo pin for sensor
+| Component            | Pin in Code            | Description                 |
+| -------------------- | ---------------------- | --------------------------- |
+| Motor1 (Front Right) | 9 (PWM), 8 (Digital)   | Speed control and direction |
+| Motor2 (Front Left)  | 11 (PWM), 10 (Digital) | Speed control and direction |
+| Motor3 (Rear Right)  | 6 (PWM), 4 (Digital)   | Speed control and direction |
+| Motor4 (Rear Left)   | 3 (PWM), 2 (Digital)   | Speed control and direction |
+| Servo Motor          | 14 (PWM Digital)       | Servo control               |
+| Ultrasonic Trigger   | 12                     | Trigger pin for sensor      |
+| Ultrasonic Echo      | 13                     | Echo pin for sensor         |
+
 
 ⚙️ Code Explanation
 📏 Distance Measurement: Uses readUltrasonicDistance() to get distance from the sensor.
@@ -55,4 +57,20 @@ You can adjust thresholdDistanceCm to set the distance threshold.
 Adjust motorSpeed (0-255) to control motor speed.
 
 Make sure to use a proper power supply to safely run the motors and servo.
+
+
+📤 Expected Output Behavior:
+1. When an object is detected farther than 60 inches (152 cm):
+   -The servo rotates right gradually by 1 degree every 50 ms until it reaches 0°.
+   -The motors rotate the device to the right at full speed (PWM 255).
+
+2. When an object is detected at 60 inches or closer:
+   - The servo rotates left gradually by 1 degree every 50 ms until it reaches 180°.
+   - The motors rotate the device to the left at full speed (PWM 255).
+
+3. If no valid distance is detected:
+   - All motors stop.
+   - Servo resets to center position (90°).
+   - The servo and motors update smoothly every 50 milliseconds for gradual turning.
+
 
