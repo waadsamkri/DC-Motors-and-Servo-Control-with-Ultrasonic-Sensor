@@ -1,0 +1,128 @@
+#include <Servo.h>
+
+// DC Motors Pins
+int motor1Pin1 = 9;  // PWM (Front Right)
+int motor1Pin2 = 8;  // Direction
+int motor2Pin1 = 11; // PWM (Front Left)
+int motor2Pin2 = 10; // Direction
+int motor3Pin1 = 6;  // PWM (Rear Right)
+int motor3Pin2 = 4;  // Direction
+int motor4Pin1 = 3;  // PWM (Rear Left)
+int motor4Pin2 = 2;  // Direction
+
+// Servo
+Servo myServo;
+int servoPin = 14; // Servo pin
+
+// Ultrasonic sensor
+const int trigPin = 12;
+const int echoPin = 13;
+
+// Threshold distance in cm (60 inches = 152 cm)
+const long thresholdDistanceCm = 152;
+
+// Motor speed PWM (0-255)
+const int motorSpeed = 255;
+
+// Current servo angle
+int servoAngle = 90; // start in the middle
+
+void setup() {
+  pinMode(motor1Pin1, OUTPUT);
+  pinMode(motor1Pin2, OUTPUT);
+  pinMode(motor2Pin1, OUTPUT);
+  pinMode(motor2Pin2, OUTPUT);
+  pinMode(motor3Pin1, OUTPUT);
+  pinMode(motor3Pin2, OUTPUT);
+  pinMode(motor4Pin1, OUTPUT);
+  pinMode(motor4Pin2, OUTPUT);
+
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
+
+  myServo.attach(servoPin);
+  myServo.write(servoAngle);
+}
+
+void loop() {
+  long distance = readUltrasonicDistance();
+
+  if (distance > 0) {
+    if (distance > thresholdDistanceCm) {
+      // Distance greater than 60 inches
+      servoAngle = max(0, servoAngle - 1); // rotate servo 1 degree right
+      myServo.write(servoAngle);
+      turnRight();
+    } else {
+      // Distance less or equal to 60 inches
+      servoAngle = min(180, servoAngle + 1); // rotate servo 1 degree left
+      myServo.write(servoAngle);
+      turnLeft();
+    }
+  } else {
+    stopMotors();
+    servoAngle = 90;
+    myServo.write(servoAngle);
+  }
+
+  delay(50);
+}
+
+long readUltrasonicDistance() {
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+
+  digitalWrite(trigPin, LOW);
+
+  long duration = pulseIn(echoPin, HIGH, 30000);
+
+  if (duration == 0) return -1;
+
+  long distanceCm = duration * 0.034 / 2;
+  return distanceCm;
+}
+
+void turnRight() {
+  analogWrite(motor1Pin1, 0);
+  digitalWrite(motor1Pin2, HIGH);
+
+  analogWrite(motor2Pin1, motorSpeed);
+  digitalWrite(motor2Pin2, LOW);
+
+  analogWrite(motor3Pin1, 0);
+  digitalWrite(motor3Pin2, HIGH);
+
+  analogWrite(motor4Pin1, motorSpeed);
+  digitalWrite(motor4Pin2, LOW);
+}
+
+void turnLeft() {
+  analogWrite(motor1Pin1, motorSpeed);
+  digitalWrite(motor1Pin2, LOW);
+
+  analogWrite(motor2Pin1, 0);
+  digitalWrite(motor2Pin2, HIGH);
+
+  analogWrite(motor3Pin1, motorSpeed);
+  digitalWrite(motor3Pin2, LOW);
+
+  analogWrite(motor4Pin1, 0);
+  digitalWrite(motor4Pin2, HIGH);
+}
+
+void stopMotors() {
+  digitalWrite(motor1Pin1, LOW);
+  digitalWrite(motor1Pin2, LOW);
+
+  digitalWrite(motor2Pin1, LOW);
+  digitalWrite(motor2Pin2, LOW);
+
+  digitalWrite(motor3Pin1, LOW);
+  digitalWrite(motor3Pin2, LOW);
+
+  digitalWrite(motor4Pin1, LOW);
+  digitalWrite(motor4Pin2, LOW);
+}
